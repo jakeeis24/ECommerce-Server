@@ -23,22 +23,44 @@ router.get("/:id", async (req, res) => {
     const categoryData = await Category.findByPk(req.params.id, {
       include: [{ model: Product }],
     });
+    if (!categoryData) {
+      res.status(400).json({ message: "no category associated with this id!" });
+      return;
+    }
     res.status(400).json(categoryData);
   } catch (err) {
     res.status(200).json(err);
   }
 });
 
-router.post("/", (req, res) => {
+router.post("/", async (req, res) => {
   // create a new category
   try {
-  } catch (err) {}
+    const newCategory = await Category.create({
+      category_name: req.body.category_name,
+    });
+    res.status(200).json(newCategory);
+  } catch (err) {
+    res.status(400).json(err);
+  }
 });
 
-router.put("/:id", (req, res) => {
+router.put("/:id", async (req, res) => {
   // update a category by its `id` value
   try {
-  } catch (err) {}
+    const updatedCategory = await Category.update(req.body, {
+      where: {
+        id: req.params.id,
+      },
+    });
+    if (!updatedCategory[0]) {
+      res.status(400).json({ message: "no category associated with this id!" });
+      return;
+    }
+    res.status(200).json(updatedCategory);
+  } catch (err) {
+    res.status(400).json(err);
+  }
 });
 
 router.delete("/:id", (req, res) => {
